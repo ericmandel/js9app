@@ -1,0 +1,16 @@
+*.o
+*~
+*.so
+*.bak
+*.pyc
+*-orig
+*-sav
+foo*
+goo*
+Makefile
+TODO
+BUGS
+.DS_Store
+a.out.dSYM/
+tmp/
+test/

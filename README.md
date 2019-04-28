@@ -1,4 +1,4 @@
-JS9app: a simplified JS9 desktop app (based on Electron.js)
+js9app: a simplified JS9 desktop app (based on Electron.js)
 =============================================================
 
 ![JS9](js9AppReadme.png)

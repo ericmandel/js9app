@@ -89,13 +89,18 @@ Yes, you can! The JS9 files are contained in this folder:
 
     /path/to/js9.app/Contents/Resources/app
 
-so, for example, you can edit the js9prefs.js file and set up
-site-wide preferences. But ... but ... at that point, shouldn't you
-just clone the main repository and do the quick build:
+So, for example, you can edit the js9prefs.js file and set up
+site-wide preferences. Or you can edit/replace the js9.html file that
+defines the desktop's web page interface. But ... but ... at that
+point, shouldn't you just clone the main repository and do the quick build:
 
     git clone https://github.com/ericmandel/js9
     cd js9
     ./mkjs9 -q
+
+Then you can use the js9 script in its full glory:
+
+    js9 -a --webpage ~/myjs9pages/js9info.html ~/data/casa.fits '{"colormap":"cool", "scale":"log"}'
 
 Where can I find out more about JS9 itself?
 -------------------------------------------

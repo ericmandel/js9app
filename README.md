@@ -98,7 +98,8 @@ point, shouldn't you just clone the main repository and do the quick build:
     cd js9
     ./mkjs9 -q
 
-Then you can use the js9 script in its full glory:
+Then install Electron.js from https://github.com/electron/electron/releases
+and run the js9 script in its full desktop glory:
 
     js9 -a --webpage ~/myjs9pages/js9info.html ~/data/casa.fits '{"colormap":"cool", "scale":"log"}'
 

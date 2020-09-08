@@ -1,0 +1,159 @@
+#!/bin/bash
+# set -x
+
+CDIR=`pwd`
+SRCDIR=$CDIR/src
+ANALYSIS_PACKAGES="funtools regions"
+NPM_PACKAGES="@electron-forge/maker-pkg"
+OSID=`node -e 'console.log(\`${os.platform()}-${os.arch()}\`)'`
+
+# steps we can take
+INIT=false
+ANALYSIS=false
+JS9=false
+DIST=false
+INSTALL=false
+
+error() {
+    printf "ERROR: $1\n"
+    exit 1
+}
+
+# if no args, remake with js9
+if [ x"$1" = x ]; then
+    JS9=true
+    DIST=true
+    INSTALL=true
+fi
+
+# process args
+while [ x"$1" != x ]; do
+    case $1 in
+	--all)
+	    INIT=true
+	    ANALYSIS=true
+	    JS9=true
+	    DIST=true
+	    INITAPP=true
+	    INSTALL=true
+	    shift
+	    continue;;
+
+	--rejs9)
+	    JS9=true
+	    DIST=true
+	    INSTALL=true
+	    shift
+	    continue;;
+
+	--init)
+	    INIT=true
+	    shift
+	    continue;;
+
+	--initapp)
+	    INITAPP=true
+	    shift
+	    continue;;
+
+	--analysis)
+	    ANALYSIS=true
+	    shift
+	    continue;;
+
+	--js9)
+	    JS9=true
+	    shift
+	    continue;;
+
+	--dist)
+	    DIST=true
+	    shift
+	    continue;;
+
+	--install)
+	    INSTALL=true
+	    shift
+	    continue;;
+
+        *) break;;
+    esac
+done
+
+printf "Building JS9 App `date` ...\n"
+
+# initialize src directory?
+if [ x"$INIT" = xtrue ]; then
+  printf "\ncreating new $SRCDIR directory\n"
+  rm -rf $SRCDIR && mkdir -p $SRCDIR || error "can't init $SRCDIR"
+fi
+
+# install packages, including js9
+if [ x"$JS9" = xtrue ]; then
+  PACKAGES="js9 "
+fi
+if [ x"$ANALYSIS" = xtrue ]; then
+  PACKAGES="$PACKAGES $ANALYSIS_PACKAGES"
+fi
+if [ x"$PACKAGES" != x ]; then
+  printf "installing analysis packages ...\n"
+fi
+for pkg in `echo $PACKAGES`; do
+  printf "** install $pkg ...\n"
+  case $pkg in
+    funtools) XTRA="MAN_SHARE_DIR=$SRCDIR/share/funtools" ;;
+    *) XTRA="" ;;
+  esac
+  cd $CDIR/../$pkg || error "can't enter $pkg directory"
+  $CDIR/build/xmake || error "can't make package: $pkg"
+  make prefix="$SRCDIR/$OSID" WEBDIR="$SRCDIR" $XTRA install  || error "can't install package: $pkg"
+  make clean
+done
+if [ x"$JS9" = xtrue ]; then
+  cd $SRCDIR || error "can't cd to $SRCDIR"
+  VER=`sed -n 's#.*"version": *"\([^"]*\)".*$#\1#p' < $CDIR/../js9/package.json`
+  printf "js9 version: $VER\n"
+  printf 'change workDir to $tmp\n'
+  sed 's#\("workDir":.*\)\("./tmp"\)#\1"$tmp"#g' < js9Prefs.json >  njs9Prefs.json && mv njs9Prefs.json js9Prefs.json
+fi
+
+# initialize app using electron-forge
+if [ x"$INITAPP" = xtrue ]; then
+  printf "\nusing electron-forge to set up app ...\n"
+  cd $SRCDIR || "can't enter $src directory"
+  printf "electron-forge import\n"
+  npx @electron-forge/cli import || error "can't import using electron-forge"
+  printf "saving electron-forge package.json\n"
+  mv package.json{,-orig} || error "can't save package.json"
+  printf "copying our package.json into $SRCDIR\n"
+  cp -p $CDIR/build/package.json $SRCDIR || error "can't copy our package.json"
+  printf "installing extra electron-forge packages ...\n"
+  for pkg in `echo $NPM_PACKAGES`; do
+    printf "** install $pkg\n"
+    npm install $pkg || error "can't install npm package: $pkg"
+  done
+fi
+if [ x"$JS9" = xtrue ]; then
+  cd $SRCDIR || "can't enter $SRCDIR directory"
+  sed 's#\(.*"version": *"\)\([^"]*\)\(".*$\)#\1'$VER'\3#' < package.json > npackage.json && mv npackage.json package.json  || error "can't set js9 version"
+fi
+
+# create distribution(s)
+if [ x"$DIST" = xtrue ]; then
+  printf "\nusing electron-forge to generate app ...\n"
+  cd $SRCDIR || "can't enter $SRCDIR directory"
+  # npm run package
+  npm run make
+fi
+
+if [ x"$INSTALL" = xtrue ]; then
+  mkdir -p $CDIR/dist
+  cd $SRCDIR/out || "can't enter $SRCDIR/out directory"
+  printf "\ninstalling tar file in dist\n"
+  rm -rf $CDIR/dist/js9-${OSID}.tar.gz
+  tar cf - js9-${OSID} | gzip -c > $CDIR/dist/js9-${OSID}.tgz
+  VER=`sed -n 's#.*"version": *"\([^"]*\)".*$#\1#p' < $SRCDIR/package.json`
+  printf "installing pkg file for version $VER in dist\n"
+  cp -p $SRCDIR/out/make/js9-${VER}.pkg $CDIR/dist/.
+fi
+

@@ -7,10 +7,13 @@
 *-sav
 foo*
 goo*
-Makefile
 TODO
 BUGS
 .DS_Store
 a.out.dSYM/
 tmp/
 test/
+src/
+dist/js9-darwin-x64.tgz
+
+

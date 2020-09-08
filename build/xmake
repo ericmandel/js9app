@@ -1,0 +1,44 @@
+#!/bin/bash
+# set -x
+
+XMAKE=make
+
+PLATFORM=`uname`
+case $PLATFORM in
+  Linux)
+  OS=linux
+  ;;
+
+  Darwin)
+  OS=macosx
+  ;;
+esac
+
+DIR=`pwd`
+WHICH=`basename $DIR`
+case $WHICH in
+    js9*)
+    CONFIG=build/saoconfig
+    ;;
+
+    *)
+    CONFIG=saoconfig
+    ;;
+esac
+
+if [ -x $CONFIG ]; then
+  echo "running config ($CONFIG) ..."
+  ./$CONFIG $1 1>foo.conf 2>&1
+  if [ $? != 0 ]; then
+    echo "config failed ... stop"
+    exit 1
+  fi
+
+  echo "running $XMAKE ..."
+  $XMAKE OS=$OS $* 1>foo 2>&1
+
+  echo "running errcheck ..."
+  $XMAKE errcheck
+else
+  $XMAKE OS=$OS $*
+fi

@@ -32,6 +32,8 @@ start it up.
 Can I use scripting with this version of JS9?
 ---------------------------------------------
 
+NB: scripting does not work yet. But soon ...
+
 Once the js9 app is running, you can save the *js9msg* script into your home
 directory by selecting the *File: save messaging script* menu option.  This
 script is identical to the *js9* script that comes with the full JS9 repository,

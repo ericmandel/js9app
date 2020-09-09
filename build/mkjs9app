@@ -12,7 +12,6 @@ INIT=false
 ANALYSIS=false
 JS9=false
 DIST=false
-INSTALL=false
 
 error() {
     printf "ERROR: $1\n"
@@ -23,7 +22,6 @@ error() {
 if [ x"$1" = x ]; then
     JS9=true
     DIST=true
-    INSTALL=true
 fi
 
 # process args
@@ -35,14 +33,12 @@ while [ x"$1" != x ]; do
 	    JS9=true
 	    DIST=true
 	    INITAPP=true
-	    INSTALL=true
 	    shift
 	    continue;;
 
 	--rejs9)
 	    JS9=true
 	    DIST=true
-	    INSTALL=true
 	    shift
 	    continue;;
 
@@ -68,11 +64,6 @@ while [ x"$1" != x ]; do
 
 	--dist)
 	    DIST=true
-	    shift
-	    continue;;
-
-	--install)
-	    INSTALL=true
 	    shift
 	    continue;;
 
@@ -145,15 +136,3 @@ if [ x"$DIST" = xtrue ]; then
   # npm run package
   npm run make
 fi
-
-if [ x"$INSTALL" = xtrue ]; then
-  mkdir -p $CDIR/dist
-  cd $SRCDIR/out || "can't enter $SRCDIR/out directory"
-  printf "\ninstalling tar file in dist\n"
-  rm -rf $CDIR/dist/js9-${OSID}.tar.gz
-  tar cf - js9-${OSID} | gzip -c > $CDIR/dist/js9-${OSID}.tgz
-  VER=`sed -n 's#.*"version": *"\([^"]*\)".*$#\1#p' < $SRCDIR/package.json`
-  printf "installing pkg file for version $VER in dist\n"
-  cp -p $SRCDIR/out/make/js9-${VER}.pkg $CDIR/dist/.
-fi
-

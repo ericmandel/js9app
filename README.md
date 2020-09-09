@@ -6,8 +6,7 @@ js9app: a simplified JS9 desktop app (based on Electron.js)
 What is it?
 -----------
 
-The js9-3.x.y.pkg file in the dist subdirectory of this repository
-allows you to install a self-contained Mac desktop app for the JS9
+You can install a self-contained Mac desktop app for the JS9
 image display program.
 
 Of course, the full version at https://github.com/ericmandel/js9
@@ -18,12 +17,11 @@ this app will suffice for many needs.
 How do I install it?
 --------------------
 
-You can grab the latest .pkg file from the dist directory in this
-repository, or just clone repository itself:
+Download the .pkg file from the main JS9 website:
 
-    git clone https://github.com/ericmandel/js9app
+https://js9.si.edu/downloads/js9-3.1.0.pkg
 
-Double-click the dist/js9-x.y.z.pkg file and follow the instructions to
+Double-click the downloaded file and follow the instructions to
 install the js9.app into the Applications folder.
 
 Using the Finder, drag the js9.app folder onto the Dock and click to

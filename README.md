@@ -17,7 +17,7 @@ this app will suffice for many needs.
 How do I install it?
 --------------------
 
-Download the .pkg file from the main JS9 website:
+Download the desktop app zip file from the main JS9 website:
 
 https://js9.si.edu/downloads/js9-darwin-x64-3.1.0.zip
 

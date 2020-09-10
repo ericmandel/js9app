@@ -19,13 +19,13 @@ How do I install it?
 
 Download the .pkg file from the main JS9 website:
 
-https://js9.si.edu/downloads/js9-3.1.0.pkg
+https://js9.si.edu/downloads/js9-darwin-x64-3.1.0.zip
 
-Double-click the downloaded file and follow the instructions to
-install the js9.app into the Applications folder.
+Unzip the downloaded file (if not done automatically) and move js9.app into
+the system /Applications directory or your personal ~/Applications directory.
 
-Using the Finder, drag the js9.app folder onto the Dock and click to
-start it up.
+Using the Finder, you can drag the js9.app folder onto the Dock and just click
+to start.
 
 Can I use scripting with this version of JS9?
 ---------------------------------------------

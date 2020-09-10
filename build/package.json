@@ -1,6 +1,6 @@
 {
   "name": "js9",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "astronomical image display everywhere",
   "main": "js9Electron.js",
   "scripts": {
@@ -55,7 +55,19 @@
     "forge": {
       "packagerConfig": {
         "icon": "images/js9logo/mac/js9logo.icns",
-        "name": "js9"
+        "name": "js9",
+        "osxSign": {
+          "identity": "Developer ID Application: Eric Mandel (3WQNJD443N)",
+          "gatekeeper-assess": false,
+          "hardened-runtime": true,
+          "entitlements": "entitlements.plist",
+          "entitlements-inherit": "entitlements.plist",
+          "signature-flags": "library"
+        },
+        "osxNotarize": {
+          "appleId": "emandel@cfa.harvard.edu",
+          "appleIdPassword": "@keychain:AC_PASSWORD"
+        }
       },
       "makers": [
         {

@@ -98,6 +98,10 @@ for pkg in `echo $PACKAGES`; do
   cd $CDIR/../$pkg || error "can't enter $pkg directory"
   $CDIR/build/xmake || error "can't make package: $pkg"
   make prefix="$SRCDIR/$OSID" WEBDIR="$SRCDIR" $XTRA install  || error "can't install package: $pkg"
+  # funtools removes write permission from libs, which breaks code-signing
+  if [ x"$pkg" = xfuntools ]; then
+    chmod 644 $SRCDIR/$OSID/lib/libfuntools.a
+  fi
   make clean
 done
 if [ x"$JS9" = xtrue ]; then
@@ -116,8 +120,9 @@ if [ x"$INITAPP" = xtrue ]; then
   npx @electron-forge/cli import || error "can't import using electron-forge"
   printf "saving electron-forge package.json\n"
   mv package.json{,-orig} || error "can't save package.json"
-  printf "copying our package.json into $SRCDIR\n"
-  cp -p $CDIR/build/package.json $SRCDIR || error "can't copy our package.json"
+  printf "copying our package.json and aux files into $SRCDIR\n"
+  cp -p $CDIR/build/package.json $SRCDIR/. || error "can't copy our package.json"
+  cp -p $CDIR/build/entitlements.plist $SRCDIR/. || error "can't copy our entitlements file"
   printf "installing extra electron-forge packages ...\n"
   for pkg in `echo $NPM_PACKAGES`; do
     printf "** install $pkg\n"

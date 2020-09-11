@@ -36,6 +36,11 @@ while [ x"$1" != x ]; do
 	    shift
 	    continue;;
 
+	--check)
+	    CHECK=true
+	    shift
+	    continue;;
+
 	--rejs9)
 	    JS9=true
 	    DIST=true
@@ -72,6 +77,22 @@ while [ x"$1" != x ]; do
 done
 
 printf "Building JS9 App `date` ...\n"
+
+# diff check on package.json, in case the js9 version has diverged from js9app
+if [ x"$INITAPP" = xtrue -o x"$CHECK" = xtrue ]; then
+  printf "diff'ing build package.json with JS9 package.json\n"
+  diff $CDIR/build/package.json $CDIR/../js9/package.json | less
+  if [ x"$INITAPP" = xtrue ]; then
+    read -p "proceed after diff? " -n 1 -r
+    echo    # (optional) move to a new line
+    if [[ ! $REPLY =~ ^[Yy]$ ]]
+    then
+      exit 1
+    fi
+  else
+    exit 0
+  fi
+fi
 
 # initialize src directory?
 if [ x"$INIT" = xtrue ]; then

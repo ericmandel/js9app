@@ -41,7 +41,7 @@ while [ x"$1" != x ]; do
 	    shift
 	    continue;;
 
-	--rejs9)
+	--js9app)
 	    JS9=true
 	    DIST=true
 	    shift

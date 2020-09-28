@@ -7,10 +7,12 @@ PLATFORM=`uname`
 case $PLATFORM in
   Linux)
   OS=linux
+  TARG=bokhara
   ;;
 
   Darwin)
   OS=macosx
+  TARG=baba
   ;;
 esac
 
@@ -28,7 +30,7 @@ esac
 
 if [ -x $CONFIG ]; then
   echo "running config ($CONFIG) ..."
-  ./$CONFIG $1 1>foo.conf 2>&1
+  ./$CONFIG $TARG 1>foo.conf 2>&1
   if [ $? != 0 ]; then
     echo "config failed ... stop"
     exit 1

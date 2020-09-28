@@ -7,7 +7,7 @@ ANALYSIS_PACKAGES="funtools regions"
 NPM_PACKAGES="@electron-forge/maker-pkg"
 OSID=`node -e 'console.log(\`${os.platform()}-${os.arch()}\`)'`
 
-# steps we can take
+# steps we can take, in order
 INIT=false
 ANALYSIS=false
 JS9=false
@@ -20,8 +20,8 @@ error() {
 
 # if no args, remake with js9
 if [ x"$1" = x ]; then
-    JS9=true
-    DIST=true
+  echo "usage $0 [build opt]"
+  exit 1
 fi
 
 # process args
@@ -29,15 +29,10 @@ while [ x"$1" != x ]; do
     case $1 in
 	--all)
 	    INIT=true
+	    INITAPP=true
 	    ANALYSIS=true
 	    JS9=true
 	    DIST=true
-	    INITAPP=true
-	    shift
-	    continue;;
-
-	--check)
-	    CHECK=true
 	    shift
 	    continue;;
 
@@ -78,26 +73,36 @@ done
 
 printf "Building JS9 App `date` ...\n"
 
-# diff check on package.json, in case the js9 version has diverged from js9app
-if [ x"$INITAPP" = xtrue -o x"$CHECK" = xtrue ]; then
-  printf "diff'ing build package.json with JS9 package.json\n"
-  diff $CDIR/build/package.json $CDIR/../js9/package.json | less
-  if [ x"$INITAPP" = xtrue ]; then
-    read -p "proceed after diff? " -n 1 -r
-    echo    # (optional) move to a new line
-    if [[ ! $REPLY =~ ^[Yy]$ ]]
-    then
-      exit 1
-    fi
-  else
-    exit 0
-  fi
-fi
-
 # initialize src directory?
 if [ x"$INIT" = xtrue ]; then
   printf "\ncreating new $SRCDIR directory\n"
   rm -rf $SRCDIR && mkdir -p $SRCDIR || error "can't init $SRCDIR"
+fi
+
+# initialize app using electron-forge
+if [ x"$INITAPP" = xtrue ]; then
+  printf "\nusing electron-forge to set up app ...\n"
+  cd $SRCDIR || "can't enter $src directory"
+  if [ ! -r package.json ]; then
+    printf "copying js9 package.json file into $SRCDIR\n"
+    cp -p $CDIR/../js9/package.json $SRCDIR/. || error "can't copy package.json"
+  fi
+  printf "electron-forge import\n"
+  npx @electron-forge/cli import || error "can't import using electron-forge"
+  printf "saving original package.json\n"
+  mv package.json{,-orig} || error "can't save package.json"
+  printf "copying our package.json and aux files into $SRCDIR\n"
+  cp -p $CDIR/build/package.json $SRCDIR/. || error "can't copy our package.json"
+  cp -p $CDIR/build/entitlements.plist $SRCDIR/. || error "can't copy our entitlements file"
+  printf "installing extra electron-forge packages ...\n"
+  for pkg in `echo $NPM_PACKAGES`; do
+    printf "** install $pkg\n"
+    npm install $pkg || error "can't install npm package: $pkg"
+  done
+fi
+if [ x"$JS9" = xtrue ]; then
+  cd $SRCDIR || "can't enter $SRCDIR directory"
+  sed 's#\(.*"version": *"\)\([^"]*\)\(".*$\)#\1'$VER'\3#' < package.json > npackage.json && mv npackage.json package.json  || error "can't set js9 version"
 fi
 
 # install packages, including js9
@@ -131,30 +136,6 @@ if [ x"$JS9" = xtrue ]; then
   printf "js9 version: $VER\n"
   printf 'change workDir to $tmp\n'
   sed 's#\("workDir":.*\)\("./tmp"\)#\1"$tmp"#g' < js9Prefs.json >  njs9Prefs.json && mv njs9Prefs.json js9Prefs.json
-fi
-
-# initialize app using electron-forge
-if [ x"$INITAPP" = xtrue ]; then
-  printf "\nusing electron-forge to set up app ...\n"
-  cd $SRCDIR || "can't enter $src directory"
-  printf "electron-forge import\n"
-  npx @electron-forge/cli import || error "can't import using electron-forge"
-  if [ -r package.json ]; then
-    printf "saving original package.json\n"
-    mv package.json{,-orig} || error "can't save package.json"
-  fi
-  printf "copying our package.json and aux files into $SRCDIR\n"
-  cp -p $CDIR/build/package.json $SRCDIR/. || error "can't copy our package.json"
-  cp -p $CDIR/build/entitlements.plist $SRCDIR/. || error "can't copy our entitlements file"
-  printf "installing extra electron-forge packages ...\n"
-  for pkg in `echo $NPM_PACKAGES`; do
-    printf "** install $pkg\n"
-    npm install $pkg || error "can't install npm package: $pkg"
-  done
-fi
-if [ x"$JS9" = xtrue ]; then
-  cd $SRCDIR || "can't enter $SRCDIR directory"
-  sed 's#\(.*"version": *"\)\([^"]*\)\(".*$\)#\1'$VER'\3#' < package.json > npackage.json && mv npackage.json package.json  || error "can't set js9 version"
 fi
 
 # create distribution(s)

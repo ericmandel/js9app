@@ -102,6 +102,8 @@ if [ x"$INITAPP" = xtrue ]; then
 fi
 if [ x"$JS9" = xtrue ]; then
   cd $SRCDIR || "can't enter $SRCDIR directory"
+  VER=`sed -n 's#.*"version": *"\([^"]*\)".*$#\1#p' < $CDIR/../js9/package.json`
+  printf "js9 version: $VER\n"
   sed 's#\(.*"version": *"\)\([^"]*\)\(".*$\)#\1'$VER'\3#' < package.json > npackage.json && mv npackage.json package.json  || error "can't set js9 version"
 fi
 
@@ -132,8 +134,6 @@ for pkg in `echo $PACKAGES`; do
 done
 if [ x"$JS9" = xtrue ]; then
   cd $SRCDIR || error "can't cd to $SRCDIR"
-  VER=`sed -n 's#.*"version": *"\([^"]*\)".*$#\1#p' < $CDIR/../js9/package.json`
-  printf "js9 version: $VER\n"
   printf 'change workDir to $tmp\n'
   sed 's#\("workDir":.*\)\("./tmp"\)#\1"$tmp"#g' < js9Prefs.json >  njs9Prefs.json && mv njs9Prefs.json js9Prefs.json
 fi

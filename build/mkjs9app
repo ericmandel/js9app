@@ -139,8 +139,10 @@ if [ x"$INITAPP" = xtrue ]; then
   cd $SRCDIR || "can't enter $src directory"
   printf "electron-forge import\n"
   npx @electron-forge/cli import || error "can't import using electron-forge"
-  printf "saving electron-forge package.json\n"
-  mv package.json{,-orig} || error "can't save package.json"
+  if [ -r package.json ]; then
+    printf "saving original package.json\n"
+    mv package.json{,-orig} || error "can't save package.json"
+  fi
   printf "copying our package.json and aux files into $SRCDIR\n"
   cp -p $CDIR/build/package.json $SRCDIR/. || error "can't copy our package.json"
   cp -p $CDIR/build/entitlements.plist $SRCDIR/. || error "can't copy our entitlements file"

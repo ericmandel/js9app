@@ -82,7 +82,7 @@ fi
 # initialize app using electron-forge
 if [ x"$INITAPP" = xtrue ]; then
   printf "\nusing electron-forge to set up app ...\n"
-  cd $SRCDIR || "can't enter $src directory"
+  cd $SRCDIR || error "can't enter $src directory"
   if [ ! -r package.json ]; then
     printf "copying js9 package.json file into $SRCDIR\n"
     cp -p $CDIR/../js9/package.json $SRCDIR/. || error "can't copy package.json"
@@ -101,7 +101,7 @@ if [ x"$INITAPP" = xtrue ]; then
   done
 fi
 if [ x"$JS9" = xtrue ]; then
-  cd $SRCDIR || "can't enter $SRCDIR directory"
+  cd $SRCDIR || error "can't enter $SRCDIR directory"
   VER=`sed -n 's#.*"version": *"\([^"]*\)".*$#\1#p' < $CDIR/../js9/package.json`
   printf "js9 version: $VER\n"
   sed 's#\(.*"version": *"\)\([^"]*\)\(".*$\)#\1'$VER'\3#' < package.json > npackage.json && mv npackage.json package.json  || error "can't set js9 version"
@@ -141,7 +141,7 @@ fi
 # create distribution(s)
 if [ x"$DIST" = xtrue ]; then
   printf "\nusing electron-forge to generate app ...\n"
-  cd $SRCDIR || "can't enter $SRCDIR directory"
+  cd $SRCDIR || error "can't enter $SRCDIR directory"
   # npm run package
   npm run make
 fi

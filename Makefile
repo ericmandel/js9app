@@ -1,14 +1,11 @@
 guard:		FORCE
-		@(echo "use 'make all' or 'make js9app' to build the app")
+		@(echo "use 'make all' or 'make app' to build the app")
 
 all:		FORCE
 		build/mkjs9app --all
 
-js9app:		FORCE
-		build/mkjs9app --js9app
-
-install:	FORCE
-		build/mkjs9app --install
+app:		FORCE
+		build/mkjs9app --app
 
 spell:		FORCE
 		@(aspell -c README.md)

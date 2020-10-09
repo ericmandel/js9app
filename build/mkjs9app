@@ -6,6 +6,9 @@ SRCDIR=$CDIR/src
 ANALYSIS_PACKAGES="funtools regions"
 NPM_PACKAGES="@electron-forge/maker-pkg"
 OSID=`node -e 'console.log(\`${os.platform()}-${os.arch()}\`)'`
+if [ x"$OSID" = xdarwin-x64 ]; then
+  SSID=`/System/Library/PrivateFrameworks/Apple80211.framework/Resources/airport -I | egrep ' SSID:' | awk '{print $2}'`
+fi
 
 # steps we can take, in order
 INIT=false
@@ -36,7 +39,7 @@ while [ x"$1" != x ]; do
 	    shift
 	    continue;;
 
-	--js9app)
+	--app)
 	    JS9=true
 	    DIST=true
 	    shift
@@ -71,7 +74,7 @@ while [ x"$1" != x ]; do
     esac
 done
 
-printf "Building JS9 App `date` ...\n"
+printf "\nBuilding JS9 App: $OSID $SSID `date` ...\n"
 
 # initialize src directory?
 if [ x"$INIT" = xtrue ]; then
@@ -91,8 +94,13 @@ if [ x"$INITAPP" = xtrue ]; then
   npx @electron-forge/cli import || error "can't import using electron-forge"
   printf "saving original package.json\n"
   mv package.json{,-orig} || error "can't save package.json"
-  printf "copying our package.json and aux files into $SRCDIR\n"
-  cp -p $CDIR/build/package.json $SRCDIR/. || error "can't copy our package.json"
+  if [ x"$SSID" = xpippint ]; then
+    printf "copying no signing package.json and aux files into $SRCDIR\n"
+    cp -p $CDIR/build/no-signing-package.json $SRCDIR/package.json || error "can't copy our package.json"
+  else
+    printf "copying our package.json and aux files into $SRCDIR\n"
+    cp -p $CDIR/build/package.json $SRCDIR/. || error "can't copy our package.json"
+  fi
   cp -p $CDIR/build/entitlements.plist $SRCDIR/. || error "can't copy our entitlements file"
   printf "installing extra electron-forge packages ...\n"
   for pkg in `echo $NPM_PACKAGES`; do

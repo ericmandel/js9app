@@ -158,6 +158,12 @@ if [ x"$DIST" = xtrue ]; then
   # npm run package
   npm run make
   # copy zip file
-  cd $DISTDIR || error "can't enter $DISTDIR directory"
-  cp -p $SRCDIR/out/make/zip/$OSP/$OSA/${NAME}-${OSID}-${VER}.zip .
+  if [ x"$SSID" = xpippint -a x"$OSID" = xdarwin-x64 ]; then
+    printf "\nskip copying zip file to dist directory on pippint (darwin)\n"
+  else
+    printf "\ncopying zip file to dist directory ...\n"
+    cd $DISTDIR || error "can't enter $DISTDIR directory"
+    cp -p $SRCDIR/out/make/zip/$OSP/$OSA/${NAME}-${OSID}-${VER}.zip .
+  fi
 fi
+printf "\nAll done!\n\n"

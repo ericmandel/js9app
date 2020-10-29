@@ -49,7 +49,7 @@
     "@electron-forge/maker-rpm": "^6.0.0-beta.53",
     "@electron-forge/maker-squirrel": "^6.0.0-beta.53",
     "@electron-forge/maker-zip": "^6.0.0-beta.53",
-    "electron": "^10.1.1"
+    "electron": "^10.1.5"
   },
   "config": {
     "forge": {

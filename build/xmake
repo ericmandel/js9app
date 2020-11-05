@@ -7,7 +7,7 @@ PLATFORM=`uname`
 case $PLATFORM in
   Linux)
   OS=linux
-  TARG=bokhara
+  TARG=engle
   ;;
 
   Darwin)

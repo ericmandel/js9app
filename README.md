@@ -6,20 +6,20 @@ js9app: a simplified JS9 desktop app (based on Electron.js)
 What is it?
 -----------
 
-You can install a self-contained Mac desktop app for the JS9
-image display program.
+A self-contained desktop app for the JS9 image display program is available
+for Mac (Catalina) and Linux (Ubuntu 20.04 and compatible systems).
 
 Of course, the full version at https://github.com/ericmandel/js9
 offers more flexibility (you can tailor the user interface, add plugins,
 add server-side analysis tasks, retrieve updates easily, etc.), but
-this app will suffice for many needs.
+this app will be great for many users.
 
 How do I install it?
 --------------------
 
-Download the desktop app zip file from the main JS9 website:
+Download the appropriate zip file from the main JS9 website:
 
-https://js9.si.edu/downloads/js9-darwin-x64-3.1.0.zip
+For Mac: https://js9.si.edu/downloads/js9-darwin-x64-3.2.0.zip
 
 Unzip the downloaded file (if not done automatically) and move js9.app into
 the system /Applications directory or your personal ~/Applications directory.
@@ -27,15 +27,20 @@ the system /Applications directory or your personal ~/Applications directory.
 Using the Finder, you can drag the js9.app folder onto the Dock and just click
 to start.
 
+For Linux: https://js9.si.edu/downloads/js9-linux-x64-3.2.0.zip
+
+Unzip the downloaded file (if not done automatically) and add
+the js9-linux-x64 directory to your Linux PATH, so that you can run
+the "js9" executable to start the app.
+
+
 Can I use scripting with this version of JS9?
 ---------------------------------------------
 
-Yes, if you install Node.js, which is available at: https://nodejs.org.
-
-Once the js9 app is running, you can save the *js9msg* script into your home
-directory by selecting the *File: save messaging script* menu option.  This
-script is identical to the *js9* script that comes with the full JS9 repository,
-but is configured to know where you have installed the js9 app.
+Yes, you can! When the js9 app is running, you can save the *js9msg*
+script into your home directory by selecting the *File: save messaging
+script* menu option. (Note: unlike previous versions, there is no need
+to install Node.js to run this script.)
 
 The *js9msg* script allows you to control JS9 from the command line using
 the JS9 Public API:
@@ -56,7 +61,8 @@ Can I change/configure the JS9 files that come with the app?
 
 Yes, you can! The JS9 files are contained in this folder:
 
-    /path/to/js9.app/Contents/Resources/app
+Mac:    /path/to/js9.app/Contents/Resources/app
+Linux:  /path/to/js9-linux-x86/resources/app
 
 So, for example, you can edit the js9prefs.js file and set up
 site-wide preferences. Or you can edit/replace the js9.html file that

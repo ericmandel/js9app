@@ -10,8 +10,14 @@ NPM_PACKAGES="@electron-forge/maker-pkg"
 OSID=`node -e 'console.log(\`${os.platform()}-${os.arch()}\`)'`
 OSP=`echo $OSID | awk -F- '{print $1}'`
 OSA=`echo $OSID | awk -F- '{print $2}'`
+APPLESIGNING="N/A"
 if [ x"$OSID" = xdarwin-x64 ]; then
   SSID=`/System/Library/PrivateFrameworks/Apple80211.framework/Resources/airport -I | egrep ' SSID:' | awk '{print $2}'`
+  if [ x"$SSID" != xpippint ]; then
+    APPLESIGNING=true
+  else
+    APPLESIGNING=false
+  fi
 fi
 
 # steps we can take, in order
@@ -78,7 +84,7 @@ while [ x"$1" != x ]; do
     esac
 done
 
-printf "\nBuilding $NAME app: $OSID $SSID `date` ...\n"
+printf "\nBuilding $NAME app: $OSID `date` ...\n"
 
 # initialize src directory?
 if [ x"$INIT" = xtrue ]; then
@@ -97,27 +103,26 @@ if [ x"$INITAPP" = xtrue ]; then
   fi
   printf "electron-forge import\n"
   npx @electron-forge/cli import || error "can't import using electron-forge"
-  printf "saving original package.json\n"
-  mv package.json{,-orig} || error "can't save package.json"
-  if [ x"$SSID" = xpippint ]; then
-    printf "copying no signing package.json and aux files into $SRCDIR\n"
-    cp -p $CDIR/build/no-signing-package.json $SRCDIR/package.json || error "can't copy our package.json"
-  else
-    printf "copying our package.json and aux files into $SRCDIR\n"
-    cp -p $CDIR/build/package.json $SRCDIR/. || error "can't copy our package.json"
-  fi
-  cp -p $CDIR/build/entitlements.plist $SRCDIR/. || error "can't copy our entitlements file"
   printf "installing extra electron-forge packages ...\n"
   for pkg in `echo $NPM_PACKAGES`; do
     printf "** install $pkg\n"
     npm install $pkg || error "can't install npm package: $pkg"
   done
-fi
-if [ x"$JS9" = xtrue ]; then
-  cd $SRCDIR || error "can't enter $SRCDIR directory"
-  VER=`sed -n 's#.*"version": *"\([^"]*\)".*$#\1#p' < $CDIR/../js9/package.json`
-  printf "js9 version: $VER\n"
-  sed 's#\(.*"version": *"\)\([^"]*\)\(".*$\)#\1'$VER'\3#' < package.json > npackage.json && mv npackage.json package.json  || error "can't set js9 version"
+  if [ x"$APPLESIGNING" = xtrue ]; then
+    printf "editing package.json with signing rules\n"
+    cp -p package.json{,-orig}
+    sed -e '/"packagerConfig": *{ *}/r'$CDIR/build/sign.add < package.json   | \
+    sed -e '/"packagerConfig": *{ *}/d' > npackage.json                     && \
+    mv npackage.json package.json
+    printf "copying aux files into $SRCDIR\n"
+    cp -p $CDIR/build/entitlements.plist $SRCDIR/. || error "can't copy our entitlements file"
+  else
+    printf "editing package.json without signing rules\n"
+    cp -p package.json{,-orig}
+    sed -e '/"packagerConfig": *{ *}/r'$CDIR/build/nosign.add < package.json | \
+    sed -e '/"packagerConfig": *{ *}/d' > npackage.json                     && \
+    mv npackage.json package.json
+  fi
 fi
 
 # install packages, including js9
@@ -158,11 +163,12 @@ if [ x"$DIST" = xtrue ]; then
   # npm run package
   npm run make
   # copy zip file
-  if [ x"$SSID" = xpippint -a x"$OSID" = xdarwin-x64 ]; then
-    printf "\nskip copying zip file to dist directory on pippint (darwin)\n"
+  if [ x"$APPLESIGNING" = xfalse ]; then
+    printf "\nskip copying zip file to dist directory (Apple not signing)\n"
   else
     printf "\ncopying zip file to dist directory ...\n"
     cd $DISTDIR || error "can't enter $DISTDIR directory"
+    VER=`sed -n 's#.*"version": *"\([^"]*\)".*$#\1#p' < $CDIR/src/package.json`
     cp -p $SRCDIR/out/make/zip/$OSP/$OSA/${NAME}-${OSID}-${VER}.zip .
   fi
 fi

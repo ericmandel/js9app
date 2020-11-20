@@ -118,7 +118,7 @@ if [ x"$INITAPP" = xtrue ]; then
     printf "copying aux files into $SRCDIR\n"
     cp -p $CDIR/build/entitlements.plist $SRCDIR/. || error "can't copy our entitlements file"
   else
-    printf "editing package.json packaer rules (without signing rules)\n"
+    printf "editing package.json packager rules (without signing rules)\n"
     sed -e '/"packagerConfig": *{ *}/r'$CDIR/build/nosign.add < package.json | \
     sed -e '/"packagerConfig": *{ *}/d' > npackage.json                     && \
     mv npackage.json package.json

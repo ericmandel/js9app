@@ -109,7 +109,8 @@ if [ x"$INITAPP" = xtrue ]; then
     npm install $pkg || error "can't install npm package: $pkg"
   done
   printf "editing package.json\n"
-  sed -i .orig -f $CDIR/build/package.sed package.json
+  sed -f $CDIR/build/package.sed < package.json > npackage.json             && \
+  mv package.json package.json-orig && mv npackage.json package.json
   if [ x"$APPLESIGNING" = xtrue ]; then
     printf "editing package.json packager rules (with signing rules)\n"
     sed -e '/"packagerConfig": *{ *}/r'$CDIR/build/sign.add < package.json   | \

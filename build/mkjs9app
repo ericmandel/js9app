@@ -108,17 +108,17 @@ if [ x"$INITAPP" = xtrue ]; then
     printf "** install $pkg\n"
     npm install $pkg || error "can't install npm package: $pkg"
   done
+  printf "editing package.json\n"
+  sed -i -orig -f $CDIR/build/package.sed package.json
   if [ x"$APPLESIGNING" = xtrue ]; then
-    printf "editing package.json with signing rules\n"
-    cp -p package.json{,-orig}
+    printf "editing package.json packaer rules (with signing rules)\n"
     sed -e '/"packagerConfig": *{ *}/r'$CDIR/build/sign.add < package.json   | \
     sed -e '/"packagerConfig": *{ *}/d' > npackage.json                     && \
     mv npackage.json package.json
     printf "copying aux files into $SRCDIR\n"
     cp -p $CDIR/build/entitlements.plist $SRCDIR/. || error "can't copy our entitlements file"
   else
-    printf "editing package.json without signing rules\n"
-    cp -p package.json{,-orig}
+    printf "editing package.json packaer rules (without signing rules)\n"
     sed -e '/"packagerConfig": *{ *}/r'$CDIR/build/nosign.add < package.json | \
     sed -e '/"packagerConfig": *{ *}/d' > npackage.json                     && \
     mv npackage.json package.json

@@ -111,7 +111,7 @@ if [ x"$INITAPP" = xtrue ]; then
   printf "editing package.json\n"
   sed -i -orig -f $CDIR/build/package.sed package.json
   if [ x"$APPLESIGNING" = xtrue ]; then
-    printf "editing package.json packaer rules (with signing rules)\n"
+    printf "editing package.json packager rules (with signing rules)\n"
     sed -e '/"packagerConfig": *{ *}/r'$CDIR/build/sign.add < package.json   | \
     sed -e '/"packagerConfig": *{ *}/d' > npackage.json                     && \
     mv npackage.json package.json

@@ -19,7 +19,7 @@ How do I install it?
 
 Download the appropriate zip file from the main JS9 website:
 
-For Mac: https://js9.si.edu/downloads/js9-darwin-x64-3.2.0.zip
+For Mac: https://js9.si.edu/downloads/js9-darwin-x64-3.3.0.zip
 
 Unzip the downloaded file (if not done automatically) and move js9.app into
 the system /Applications directory or your personal ~/Applications directory.
@@ -27,7 +27,7 @@ the system /Applications directory or your personal ~/Applications directory.
 Using the Finder, you can drag the js9.app folder onto the Dock and just click
 to start.
 
-For Linux: https://js9.si.edu/downloads/js9-linux-x64-3.2.0.zip
+For Linux: https://js9.si.edu/downloads/js9-linux-x64-3.3.0.zip
 
 Unzip the downloaded file (if not done automatically) and add
 the js9-linux-x64 directory to your Linux PATH, so that you can run

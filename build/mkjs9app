@@ -20,6 +20,12 @@ if [ x"$OSID" = xdarwin-x64 ]; then
   fi
 fi
 
+# use local node/npm if present, since npm v7 doesn't work with electron-forge
+# https://github.com/electron-userland/electron-forge/issues/1998
+if [ -d $CDIR/node/current/bin ]; then
+  export PATH="$CDIR/node/current/bin:$PATH"
+fi
+
 # steps we can take, in order
 INIT=false
 ANALYSIS=false
@@ -85,6 +91,8 @@ while [ x"$1" != x ]; do
 done
 
 printf "\nBuilding $NAME app: $OSID `date` ...\n"
+echo "npm path:    `which npm`"
+echo "npm version: `npm --version`"
 
 # initialize src directory?
 if [ x"$INIT" = xtrue ]; then

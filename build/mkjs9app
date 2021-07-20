@@ -20,11 +20,13 @@ if [ x"$OSID" = xdarwin-x64 ]; then
   fi
 fi
 
+# (got v7 working)
 # use local node/npm if present, since npm v7 doesn't work with electron-forge
 # https://github.com/electron-userland/electron-forge/issues/1998
-if [ -d $CDIR/node/current/bin ]; then
-  export PATH="$CDIR/node/current/bin:$PATH"
-fi
+# if [ -d $CDIR/node/current/bin ]; then
+#   export PATH="$CDIR/node/current/bin:$PATH"
+# fi
+NPM_VER=`npm --version | awk -F. '{print $1}'`
 
 # steps we can take, in order
 INIT=false
@@ -109,12 +111,18 @@ if [ x"$INITAPP" = xtrue ]; then
     printf "copying js9 package.json file into $SRCDIR\n"
     cp -p $CDIR/../js9/package.json $SRCDIR/. || error "can't copy package.json"
   fi
-  printf "electron-forge import\n"
-  npx @electron-forge/cli import || error "can't import using electron-forge"
+  if [ x$NPM_VER = x6 ]; then
+    printf "electron-forge import (v6)\n"
+    npx @electron-forge/cli import || error "can't import using electron-forge"
+  else
+    printf "electron-forge import (v7)\n"
+    npm install --save-dev @electron-forge/cli
+    npm exec --package=@electron-forge/cli -c "electron-forge import"
+  fi
   printf "installing extra electron-forge packages ...\n"
   for pkg in `echo $NPM_PACKAGES`; do
     printf "** install $pkg\n"
-    npm install $pkg || error "can't install npm package: $pkg"
+    npm install --save-dep $pkg || error "can't install npm package: $pkg"
   done
   printf "editing package.json\n"
   sed -f $CDIR/build/package.sed < package.json > npackage.json             && \
@@ -163,6 +171,8 @@ if [ x"$JS9" = xtrue ]; then
   cd $SRCDIR || error "can't cd to $SRCDIR"
   printf 'change workDir to $tmp\n'
   sed 's#\("workDir":.*\)\("./tmp"\)#\1"$tmp"#g' < js9Prefs.json >  njs9Prefs.json && mv njs9Prefs.json js9Prefs.json
+  # the electron-forge modules are in onode_modules ... move them back
+  cd $SRCDIR/onode_modules && tar cf - . | (cd $SRCDIR/node_modules && tar xf -)
 fi
 
 # create distribution(s)
